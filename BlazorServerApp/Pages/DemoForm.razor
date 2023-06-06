@@ -1,0 +1,65 @@
+﻿
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div>
+                <form @onfocusin=HandleOnFocusIn>
+                    <div @onfocusin="(() => HandleOnFocus(nameof(DemoTextInput)))" @onfocusout="(() => HandleOnFocusOutOfInput())">
+                        <DemoTextInput/>
+                    </div>
+                    <div @onfocusin="(() => HandleOnFocus(nameof(DemoDateInput)))" @onfocusout="(() => HandleOnFocusOutOfInput())">
+                        <DemoDateInput/>
+                    </div>
+                    <div @onfocusin="(() => HandleOnFocus(nameof(DemoCheckboxInput)))" @onfocusout="(() => HandleOnFocusOutOfInput())">
+                        <DemoCheckboxInput/>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div>
+                <Advice InputType=@_focusedInputType Info=@_focusedElementAdvice/>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    private int currentCount = 0;
+    private string _FocusInEventData = string.Empty;
+
+    private string _focusedInputType = string.Empty;
+
+    private string _focusedElementAdvice => _focusedInputType switch
+        {
+            "DemoTextInput" => "Just type something in the box.",
+            "DemoCheckboxInput" => "Check for TRUE uncheck for FALSE.",
+            "DemoDateInput" => "Choose the date you find most exciting.",
+            _ => "This form contains just demo inputs. It doesn't really do anything on submit :]",
+        };
+
+    [Parameter]
+    public int IncrementAmmount { get; set; } = 1;
+
+    private void IncrementCount()
+    {
+        currentCount += IncrementAmmount;
+    }
+
+    private void HandleOnFocusIn(FocusEventArgs args)
+    {
+        _FocusInEventData = args.ToString();
+    }
+
+    private void HandleOnFocus(string inputType)
+    {
+        _focusedInputType = inputType;
+    }
+
+    private void HandleOnFocusOutOfInput()
+    {
+        _focusedInputType = nameof(DemoForm);
+    }
+}

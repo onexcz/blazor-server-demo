@@ -1,0 +1,13 @@
+﻿<div>
+    <h3>Advice</h3>
+    <p><strong>@Info</strong></p>
+    <p>This advice only applies for <strong>@InputType</strong></p>
+</div>
+
+@code {
+    [Parameter]
+    public string InputType { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Info { get; set; } = string.Empty;
+}
