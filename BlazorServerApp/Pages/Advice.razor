@@ -1,7 +1,21 @@
-﻿<div>
+﻿<div class="border">
     <h3>Advice</h3>
     <p><strong>@Info</strong></p>
     <p>This advice only applies for <strong>@InputType</strong></p>
+    <br />
+    
+    <p>Value selected: @SelectedValue</p>
+
+    @if(SelectedValue is not null && InputType == nameof(DemoSelect))
+    {
+        <h3>Select value: @SelectedValue.ToString()</h3>
+    }
+
+
+    @foreach(var change in _inputTypeChanges)
+    {
+        <p>@change</p>
+    }
 </div>
 
 @code {
@@ -10,4 +24,21 @@
 
     [Parameter]
     public string Info { get; set; } = string.Empty;
+
+    [Parameter]
+    public object? SelectedValue { get; set; }
+
+    private List<string> _inputTypeChanges = new List<string>();
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        //Console.WriteLine("SetParametersAsync called");
+
+        if (parameters.TryGetValue<string>(nameof(InputType), out var result) && result != InputType)
+        {
+           // _inputTypeChanges.Add($"InputType parameter changed to: {result}");
+        }
+
+        await base.SetParametersAsync(parameters);
+    }
 }

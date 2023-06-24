@@ -1,0 +1,51 @@
+﻿@using BlazorServerApp.Models
+
+<div>
+    <label>Select</label>
+    <select @oninput=@HandleSelectionChange @ref="inputElement">
+        <option value="A"> Option A </option>
+        <option value="B"> Option B </option>
+        <option value="C"> Option C </option>
+    </select>
+</div>
+
+@code {
+    [Parameter]
+    public SelectObject? Selection { get; set; }
+
+    [Parameter]
+    public Action<string>? OnSelectionChange { get; set; }
+
+    [Parameter]
+    public bool IsFocused { get; set; }
+
+    private ElementReference inputElement;
+    private string? selectedValue;
+
+    protected override void OnInitialized()
+    {
+        selectedValue = Selection?.Value;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && IsFocused)
+        {
+            await inputElement.FocusAsync();
+        }
+    }
+
+    private void HandleSelectionChange(ChangeEventArgs e)
+    {
+        if (Selection is not null)
+        {
+            selectedValue = e.Value as string;
+            Selection.Value = selectedValue;
+
+            if (OnSelectionChange is not null)
+            {
+                OnSelectionChange(selectedValue ?? string.Empty);
+            }
+        }
+    }
+}

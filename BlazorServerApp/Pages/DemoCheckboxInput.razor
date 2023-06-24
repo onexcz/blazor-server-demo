@@ -1,9 +1,24 @@
 ﻿
 <div>
     <label>CheckboxInput</label>
-    <input type="checkbox" checked=@Checked/>
+    <input @ref="inputElement" class="border" type="checkbox" checked=@Checked/>
 </div>
 
 @code {
+    [Parameter]
+    public bool IsFocused { get; set; }
+
     public string Checked { get; set; }
+
+    private ElementReference inputElement;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Console.WriteLine("firstRender");
+
+        if (firstRender && IsFocused)
+        {
+            await inputElement.FocusAsync();
+        }
+    }
 }

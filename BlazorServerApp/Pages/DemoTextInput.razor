@@ -1,9 +1,39 @@
-﻿
+﻿@inject IJSRuntime JSRuntime
+
 <div>
     <label>TextInput</label>
-    <input type="text" value=@Value/>
+    <input id="text-input"  @ref="inputElement" class="border selected" type="text" value=@Value/>
 </div>
 
 @code {
-    public string Value { get; set; }
+    [Parameter]
+    public bool IsFocused { get; set; }
+
+    [Parameter]
+    public bool IsSelected { get; set; }
+
+    public string Value { get; set; } = "This is default value";
+
+    private ElementReference inputElement;
+
+    protected override void OnParametersSet() 
+    {
+        //Console.WriteLine($"TextInput: IsFocused={IsFocused}");
+        base.OnParametersSet();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Console.WriteLine("firstRender");
+
+        if (firstRender && IsFocused)
+        {
+            await inputElement.FocusAsync();
+        }
+
+        if (firstRender && IsSelected)
+        {
+            await JSRuntime.InvokeVoidAsync("selectInputValue", inputElement);
+        }
+    }
 }

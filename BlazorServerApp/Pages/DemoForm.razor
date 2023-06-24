@@ -1,56 +1,82 @@
-﻿
+﻿@using BlazorServerApp.Models
+
 <div class="container">
     <div class="row">
         <div class="col-md-6">
-            <div>
-                <form @onfocusin=HandleOnFocusIn>
-                    <div @onfocusin="(() => HandleOnFocus(nameof(DemoTextInput)))" @onfocusout="(() => HandleOnFocusOutOfInput())">
-                        <DemoTextInput/>
+            <div class="@((IsForm) ? "border" : "")">
+                <form id="demo-form" @onfocusout="(() => HandleOnFocusOutOfInput())">
+                    <div id="demo-text" @onfocusin="(() => HandleOnFocus(nameof(DemoTextInput)))">
+                        <DemoTextInput IsFocused=@false/>
                     </div>
-                    <div @onfocusin="(() => HandleOnFocus(nameof(DemoDateInput)))" @onfocusout="(() => HandleOnFocusOutOfInput())">
+                    <div id="demo-date" @onfocusin="(() => HandleOnFocus(nameof(DemoDateInput)))" >
                         <DemoDateInput/>
                     </div>
-                    <div @onfocusin="(() => HandleOnFocus(nameof(DemoCheckboxInput)))" @onfocusout="(() => HandleOnFocusOutOfInput())">
-                        <DemoCheckboxInput/>
+                    <div id="demo-checkbox" @onfocusin="(() => HandleOnFocus(nameof(DemoCheckboxInput)))">
+                        <DemoCheckboxInput IsFocused=@true/>
+                    </div>
+                    <div id="demo-select" @onfocusin="(() => HandleOnFocus(nameof(DemoSelect)))">
+                        <DemoSelect IsFocused=@false Selection=@Selection OnSelectionChange=@HandleSelectionChange/>
+                    </div>
+                    <div id="demo-text2" @onfocusin="(() => HandleOnFocus(nameof(DemoTextInput)))">
+                        <DemoTextInput />
                     </div>
                 </form>
+            </div>
+            <div>
+                <p>FORM: Selection option = @Selection?.Value</p>
             </div>
         </div>
         <div class="col-md-6">
             <div>
-                <Advice InputType=@_focusedInputType Info=@_focusedElementAdvice/>
+                <Advice InputType=@_focusedInputType Info=@_focusedElementAdvice SelectedValue=@_selectedValue/>
             </div>
         </div>
     </div>
+    <div >
+        <button type="button" @onclick=@(() => ModalOpen = true)>Show modal</button>
+        @if(ModalOpen)
+        {
+            <Modal Title="Modal test" Text="HEllo world" OnClose=@((val) => ModalOpen = !ModalOpen)/>
+        }
+    </div>
+    <LoadingOverlay IsVisible="@_loadingData" />
 </div>
 
 
 
 @code {
-    private int currentCount = 0;
-    private string _FocusInEventData = string.Empty;
+    private SelectObject Selection = new SelectObject();
 
-    private string _focusedInputType = string.Empty;
+    private string _focusedInputType = nameof(DemoForm);
+    private string _selectedValue = string.Empty;
+
+    private bool _loadingData = true;
+
+    public bool ModalOpen { get; set; }
+
+    private bool IsForm => _focusedInputType == nameof(DemoForm);
 
     private string _focusedElementAdvice => _focusedInputType switch
-        {
-            "DemoTextInput" => "Just type something in the box.",
-            "DemoCheckboxInput" => "Check for TRUE uncheck for FALSE.",
-            "DemoDateInput" => "Choose the date you find most exciting.",
-            _ => "This form contains just demo inputs. It doesn't really do anything on submit :]",
-        };
-
-    [Parameter]
-    public int IncrementAmmount { get; set; } = 1;
-
-    private void IncrementCount()
     {
-        currentCount += IncrementAmmount;
+        "DemoTextInput" => "Just type something in the box.",
+        "DemoCheckboxInput" => "Check for TRUE uncheck for FALSE.",
+        "DemoDateInput" => "Choose the date you find most exciting.",
+        "DemoSelect" => "Choose one of the listed options.",
+        _ => "This form contains just demo inputs. It doesn't really do anything on submit :]",
+    };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Task.Delay(TimeSpan.FromSeconds(3));
+        await base.OnParametersSetAsync();
+        _loadingData = false;
+        StateHasChanged();
     }
-
-    private void HandleOnFocusIn(FocusEventArgs args)
+    private void HandleSelectionChange(string value)
     {
-        _FocusInEventData = args.ToString();
+        Console.WriteLine($"Selection changed to: {Selection.Value}");
+        _selectedValue = value;
+        StateHasChanged();
     }
 
     private void HandleOnFocus(string inputType)
@@ -61,5 +87,6 @@
     private void HandleOnFocusOutOfInput()
     {
         _focusedInputType = nameof(DemoForm);
+        Console.WriteLine("FOCUS OUT catched");
     }
 }

@@ -1,0 +1,21 @@
+﻿<div class="loading-data-overlay @(_isVisible ? "active" : "")">
+    <p>Loading data, please wait...</p>
+</div>
+
+@code {
+    private bool _isVisible;
+
+    [Parameter]
+    public bool IsVisible
+    {
+        get => _isVisible;
+        set
+        {
+            if (_isVisible != value)
+            {
+                _isVisible = value;
+                InvokeAsync(StateHasChanged);
+            }
+        }
+    }
+}
